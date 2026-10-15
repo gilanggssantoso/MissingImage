@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missing Symbol Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --text-color: #333;
+            --bg-color: #fff;
+            --border-color: #333;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1, h2, h3 {
+            font-weight: normal;
+        }
+
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 40px;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .timer {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin: 20px 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .symbols-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .symbol-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .symbol-box {
+            border: 2px solid var(--border-color);
+            width: 64px;
+            height: 64px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 6px;
+            background-color: #fafafa;
+        }
+
+        .symbol-img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .symbol-label {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .options-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        button {
+            background-color: transparent;
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.15s ease-in-out;
+        }
+
+        button:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .option-btn {
+            font-size: 1.4rem;
+            font-weight: bold;
+            width: 60px;
+            height: 60px;
+            padding: 0;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 700px;
+            margin: 40px auto;
+        }
+
+        .divider {
+            width: 100%;
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 30px 0;
+        }
+
+        .info-list {
+            text-align: left;
+            display: inline-block;
+            margin-bottom: 30px;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="screen active">
+        <h1 style="margin-bottom: 30px;">Missing Symbol Test</h1>
+        <ul class="info-list">
+            <li>You will complete 10 sets of 50 questions.</li>
+            <li>Before each set, you will have 10 seconds to memorize 5 symbols matched with letters (A-E).</li>
+            <li>You then have 1 minute per set to identify which symbol is missing from the groups of 4.</li>
+        </ul>
+        <br>
+        <button onclick="startTest()">Mulai Tes</button>
+    </div>
+
+    <!-- MEMORIZE SCREEN -->
+    <div id="memorize-screen" class="screen">
+        <h2 id="memorize-set-title">Set 1 / 10</h2>
+        <p>Memorize these symbols:</p>
+        <div class="timer" id="memorize-timer">10</div>
+        <div class="symbols-row" id="memorize-symbols"></div>
+    </div>
+
+    <!-- TEST SCREEN -->
+    <div id="test-screen" class="screen">
+        <h2 id="test-set-title">Set 1 / 10</h2>
+        <div class="timer" id="test-timer">60</div>
+        
+        <!-- Reference Symbols -->
+        <div class="symbols-row" id="reference-symbols" style="transform: scale(0.85); margin: 0;"></div>
+        
+        <div class="divider"></div>
+
+        <!-- Question Symbols (Only 4) -->
+        <div class="symbols-row" id="question-symbols"></div>
+        
+        <!-- Answer Options -->
+        <div class="options-row">
+            <button class="option-btn" onclick="submitAnswer('A')">A</button>
+            <button class="option-btn" onclick="submitAnswer('B')">B</button>
+            <button class="option-btn" onclick="submitAnswer('C')">C</button>
+            <button class="option-btn" onclick="submitAnswer('D')">D</button>
+            <button class="option-btn" onclick="submitAnswer('E')">E</button>
+        </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen" class="screen">
+        <h1>Test Complete</h1>
+        <p>Your performance across the 10 sets:</p>
+        <div class="chart-container">
+            <canvas id="resultsChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const LETTERS = ['A', 'B', 'C', 'D', 'E'];
+        const TOTAL_SETS = 10;
+        const QUESTIONS_PER_SET = 50;
+        const MEMORIZE_DURATION = 10;
+        const TEST_DURATION = 60;
+
+        let currentSet = 1;
+        let questionsAnswered = 0;
+        let currentScore = 0;
+        let scores = [];
+        let currentSymbols = []; // Stores objects: { letter, imgUrl }
+        let currentMissingLetter = '';
+        let timerInterval = null;
+
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function startTest() {
+            currentSet = 1;
+            scores = [];
+            startNextSet();
+        }
+
+        function generateSetSymbols() {
+            const timestamp = Date.now();
+            return LETTERS.map((letter, index) => {
+                const seed = `symbol_${currentSet}_${index}_${timestamp}_${Math.random().toString(36).substring(2, 7)}`;
+                const imgUrl = `https://api.dicebear.com/7.x/icons/svg?seed=${seed}`;
+                // Preload SVG image
+                const img = new Image();
+                img.src = imgUrl;
+                return { letter: letter, imgUrl: imgUrl };
+            });
+        }
+
+        function startNextSet() {
+            if (currentSet > TOTAL_SETS) {
+                showResults();
+                return;
+            }
+
+            questionsAnswered = 0;
+            currentScore = 0;
+            currentSymbols = generateSetSymbols();
+
+            startMemorizePhase();
+        }
+
+        function startMemorizePhase() {
+            showScreen('memorize-screen');
+            document.getElementById('memorize-set-title').innerText = `Set ${currentSet} / ${TOTAL_SETS}`;
+            
+            const container = document.getElementById('memorize-symbols');
+            container.innerHTML = currentSymbols.map(sym => `
+                <div class="symbol-wrapper">
+                    <div class="symbol-box"><img src="${sym.imgUrl}" class="symbol-img" alt="symbol"></div>
+                    <div class="symbol-label">${sym.letter}</div>
+                </div>
+            `).join('');
+
+            let timeLeft = MEMORIZE_DURATION;
+            document.getElementById('memorize-timer').innerText = timeLeft;
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('memorize-timer').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    startTestPhase();
+                }
+            }, 1000);
+        }
+
+        function startTestPhase() {
+            showScreen('test-screen');
+            document.getElementById('test-set-title').innerText = `Set ${currentSet} / ${TOTAL_SETS}`;
+            
+            const refContainer = document.getElementById('reference-symbols');
+            refContainer.innerHTML = currentSymbols.map(sym => `
+                <div class="symbol-wrapper">
+                    <div class="symbol-box"><img src="${sym.imgUrl}" class="symbol-img" alt="symbol"></div>
+                    <div class="symbol-label">${sym.letter}</div>
+                </div>
+            `).join('');
+
+            generateQuestion();
+
+            let timeLeft = TEST_DURATION;
+            document.getElementById('test-timer').innerText = timeLeft;
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('test-timer').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endSet();
+                }
+            }, 1000);
+        }
+
+        function generateQuestion() {
+            if (questionsAnswered >= QUESTIONS_PER_SET) {
+                clearInterval(timerInterval);
+                endSet();
+                return;
+            }
+
+            const missingIndex = Math.floor(Math.random() * 5);
+            currentMissingLetter = currentSymbols[missingIndex].letter;
+
+            let questionImages = currentSymbols.filter((_, idx) => idx !== missingIndex).map(s => s.imgUrl);
+            questionImages = shuffle(questionImages);
+
+            const qContainer = document.getElementById('question-symbols');
+            qContainer.innerHTML = questionImages.map(imgUrl => `
+                <div class="symbol-wrapper">
+                    <div class="symbol-box"><img src="${imgUrl}" class="symbol-img" alt="symbol"></div>
+                </div>
+            `).join('');
+        }
+
+        function submitAnswer(letter) {
+            if (letter === currentMissingLetter) {
+                currentScore++;
+            }
+            questionsAnswered++;
+            generateQuestion();
+        }
+
+        function endSet() {
+            scores.push(currentScore);
+            currentSet++;
+            startNextSet();
+        }
+
+        function showResults() {
+            showScreen('result-screen');
+            
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: TOTAL_SETS}, (_, i) => `Set ${i + 1}`),
+                    datasets: [{
+                        label: 'Correct Answers (Max 50)',
+                        data: scores,
+                        borderColor: '#333',
+                        backgroundColor: 'rgba(51, 51, 51, 0.08)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.2,
+                        pointBackgroundColor: '#333',
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 50,
+                            ticks: {
+                                stepSize: 10
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
