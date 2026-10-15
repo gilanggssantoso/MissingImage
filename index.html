@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Missing Symbol Test</title>
+    <title>Tes Gambar Hilang</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -81,6 +81,8 @@
             height: 40px;
             object-fit: contain;
             pointer-events: none;
+            /* This forces the image to be a pure black monochromatic silhouette */
+            filter: grayscale(100%) brightness(0); 
         }
 
         .symbol-label {
@@ -106,7 +108,7 @@
             transition: all 0.15s ease-in-out;
         }
 
-        button:hover {
+        button:hover, button:active {
             background-color: var(--text-color);
             color: var(--bg-color);
         }
@@ -150,6 +152,7 @@
             <li>You will complete 10 sets of 50 questions.</li>
             <li>Before each set, you will have 10 seconds to memorize 5 symbols matched with letters (A-E).</li>
             <li>You then have 1 minute per set to identify which symbol is missing from the groups of 4.</li>
+            <li><strong>You can click the buttons or use the A, B, C, D, E keys on your keyboard to answer.</strong></li>
         </ul>
         <br>
         <button onclick="startTest()">Mulai Tes</button>
@@ -178,11 +181,11 @@
         
         <!-- Answer Options -->
         <div class="options-row">
-            <button class="option-btn" onclick="submitAnswer('A')">A</button>
-            <button class="option-btn" onclick="submitAnswer('B')">B</button>
-            <button class="option-btn" onclick="submitAnswer('C')">C</button>
-            <button class="option-btn" onclick="submitAnswer('D')">D</button>
-            <button class="option-btn" onclick="submitAnswer('E')">E</button>
+            <button class="option-btn" id="btn-A" onclick="submitAnswer('A')">A</button>
+            <button class="option-btn" id="btn-B" onclick="submitAnswer('B')">B</button>
+            <button class="option-btn" id="btn-C" onclick="submitAnswer('C')">C</button>
+            <button class="option-btn" id="btn-D" onclick="submitAnswer('D')">D</button>
+            <button class="option-btn" id="btn-E" onclick="submitAnswer('E')">E</button>
         </div>
     </div>
 
@@ -235,8 +238,8 @@
             const timestamp = Date.now();
             return LETTERS.map((letter, index) => {
                 const seed = `symbol_${currentSet}_${index}_${timestamp}_${Math.random().toString(36).substring(2, 7)}`;
-                const imgUrl = `https://api.dicebear.com/7.x/icons/svg?seed=${seed}`;
-                // Preload SVG image
+                // Added backgroundColor=transparent to ensure only the icon shape is visible for the silhouette
+                const imgUrl = `https://api.dicebear.com/7.x/icons/svg?seed=${seed}&backgroundColor=transparent`;
                 const img = new Image();
                 img.src = imgUrl;
                 return { letter: letter, imgUrl: imgUrl };
@@ -335,6 +338,17 @@
             if (letter === currentMissingLetter) {
                 currentScore++;
             }
+            
+            const btn = document.getElementById(`btn-${letter}`);
+            if (btn) {
+                btn.style.backgroundColor = 'var(--text-color)';
+                btn.style.color = 'var(--bg-color)';
+                setTimeout(() => {
+                    btn.style.backgroundColor = 'transparent';
+                    btn.style.color = 'var(--text-color)';
+                }, 100);
+            }
+
             questionsAnswered++;
             generateQuestion();
         }
@@ -384,6 +398,24 @@
                 }
             });
         }
+
+        document.addEventListener('keydown', (event) => {
+            const testScreen = document.getElementById('test-screen');
+            if (!testScreen.classList.contains('active')) {
+                return;
+            }
+
+            if (event.ctrlKey || event.altKey || event.metaKey) {
+                return;
+            }
+
+            const key = event.key.toUpperCase();
+            if (LETTERS.includes(key)) {
+                submitAnswer(key);
+                event.preventDefault(); 
+            }
+        });
+
     </script>
 </body>
 </html>
