@@ -173,13 +173,18 @@
             box-shadow: 2px 2px 0 var(--border-color);
         }
 
-        .symbol-img {
+        .symbol-svg {
             width: 44px;
             height: 44px;
-            object-fit: contain;
-            pointer-events: none;
-            /* Turns the vector paths pure black while preserving transparent background */
-            filter: brightness(0); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .symbol-svg svg {
+            width: 100%;
+            height: 100%;
+            fill: #000 !important; /* Forces all SVG graphics to pure black */
         }
 
         .symbol-label {
@@ -249,7 +254,6 @@
             background: #fff;
         }
 
-        /* Stats Box */
         .stats-box {
             border: 2px solid var(--border-color);
             padding: 20px;
@@ -399,9 +403,7 @@
                         </div>
                     </div>
 
-                    <div class="interpretation-box" id="interpretation-text">
-                        <!-- Dynamic Stability Interpretation -->
-                    </div>
+                    <div class="interpretation-box" id="interpretation-text"></div>
                 </div>
 
                 <br><br>
@@ -455,19 +457,29 @@
             startNextSet();
         }
 
-        function generateSetSymbols() {
-            const timestamp = Date.now();
-            return LETTERS.map((letter, index) => {
-                const seed = `symbol_${currentSet}_${index}_${timestamp}_${Math.random().toString(36).substring(2, 7)}`;
-                const imgUrl = `https://api.dicebear.com/7.x/icons/svg?seed=${seed}`;
-                
-                const img = new Image();
-                img.src = imgUrl;
-                return { letter: letter, imgUrl: imgUrl };
-            });
+        // Helper to fetch SVG text and inject it inline so CSS can color paths directly
+        async function fetchSvgIcon(url) {
+            try {
+                const response = await fetch(url);
+                const svgText = await response.text();
+                return svgText;
+            } catch (e) {
+                return '';
+            }
         }
 
-        function startNextSet() {
+        async function generateSetSymbols() {
+            const timestamp = Date.now();
+            const symbolPromises = LETTERS.map(async (letter, index) => {
+                const seed = `symbol_${currentSet}_${index}_${timestamp}_${Math.random().toString(36).substring(2, 7)}`;
+                const imgUrl = `https://api.dicebear.com/7.x/icons/svg?seed=${seed}`;
+                const svgContent = await fetchSvgIcon(imgUrl);
+                return { letter: letter, svg: svgContent };
+            });
+            return await Promise.all(symbolPromises);
+        }
+
+        async function startNextSet() {
             if (currentSet > totalSets) {
                 showResults();
                 return;
@@ -475,7 +487,7 @@
 
             questionsAnswered = 0;
             currentScore = 0;
-            currentSymbols = generateSetSymbols();
+            currentSymbols = await generateSetSymbols();
 
             startMemorizePhase();
         }
@@ -487,7 +499,7 @@
             const container = document.getElementById('memorize-symbols');
             container.innerHTML = currentSymbols.map(sym => `
                 <div class="symbol-wrapper">
-                    <div class="symbol-box"><img src="${sym.imgUrl}" class="symbol-img" alt="symbol"></div>
+                    <div class="symbol-box"><div class="symbol-svg">${sym.svg}</div></div>
                     <div class="symbol-label">${sym.letter}</div>
                 </div>
             `).join('');
@@ -513,7 +525,7 @@
             const refContainer = document.getElementById('reference-symbols');
             refContainer.innerHTML = currentSymbols.map(sym => `
                 <div class="symbol-wrapper">
-                    <div class="symbol-box"><img src="${sym.imgUrl}" class="symbol-img" alt="symbol"></div>
+                    <div class="symbol-box"><div class="symbol-svg">${sym.svg}</div></div>
                     <div class="symbol-label">${sym.letter}</div>
                 </div>
             `).join('');
@@ -544,13 +556,13 @@
             const missingIndex = Math.floor(Math.random() * 5);
             currentMissingLetter = currentSymbols[missingIndex].letter;
 
-            let questionImages = currentSymbols.filter((_, idx) => idx !== missingIndex).map(s => s.imgUrl);
-            questionImages = shuffle(questionImages);
+            let questionSvgs = currentSymbols.filter((_, idx) => idx !== missingIndex).map(s => s.svg);
+            questionSvgs = shuffle(questionSvgs);
 
             const qContainer = document.getElementById('question-symbols');
-            qContainer.innerHTML = questionImages.map(imgUrl => `
+            qContainer.innerHTML = questionSvgs.map(svg => `
                 <div class="symbol-wrapper">
-                    <div class="symbol-box"><img src="${imgUrl}" class="symbol-img" alt="symbol"></div>
+                    <div class="symbol-box"><div class="symbol-svg">${svg}</div></div>
                 </div>
             `).join('');
         }
@@ -586,16 +598,12 @@
 
         function calculateStatistics(data) {
             const n = data.length;
-            
             const sum = data.reduce((a, b) => a + b, 0);
             const mean = sum / n;
-
             const squaredDeviations = data.map(x => Math.pow(x - mean, 2));
             const ssd = squaredDeviations.reduce((a, b) => a + b, 0);
-
             const variance = ssd / n;
             const sd = Math.sqrt(variance);
-
             return { mean, ssd, variance, sd };
         }
 
