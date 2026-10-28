@@ -178,7 +178,7 @@
             height: 44px;
             object-fit: contain;
             pointer-events: none;
-            filter: grayscale(100%);
+            /* Filter removed to make the images normal and legible again */
         }
 
         .symbol-label {
@@ -418,7 +418,7 @@
         const MEMORIZE_DURATION = 10;
         const TEST_DURATION = 60;
 
-        let totalSets = 10; // Default total sets
+        let totalSets = 10;
         let currentSet = 1;
         let questionsAnswered = 0;
         let currentScore = 0;
@@ -586,15 +586,12 @@
         function calculateStatistics(data) {
             const n = data.length;
             
-            // 1. Calculate Mean
             const sum = data.reduce((a, b) => a + b, 0);
             const mean = sum / n;
 
-            // 2. Deviations and Squared Deviations
             const squaredDeviations = data.map(x => Math.pow(x - mean, 2));
             const ssd = squaredDeviations.reduce((a, b) => a + b, 0);
 
-            // 3. Variance and Standard Deviation
             const variance = ssd / n;
             const sd = Math.sqrt(variance);
 
@@ -604,7 +601,6 @@
         function showResults() {
             showScreen('result-screen');
             
-            // Calculate Performance Stats
             const stats = calculateStatistics(scores);
             
             document.getElementById('stat-mean').innerText = stats.mean.toFixed(2);
@@ -612,7 +608,6 @@
             document.getElementById('stat-variance').innerText = stats.variance.toFixed(2);
             document.getElementById('stat-sd').innerText = stats.sd.toFixed(2);
 
-            // Interpret Stability
             const interpContainer = document.getElementById('interpretation-text');
             let stabilityRating = "";
             let description = "";
@@ -633,7 +628,6 @@
 
             interpContainer.innerHTML = `<strong>Tingkat Stabilitas:</strong> ${stabilityRating}<br><br>${description}`;
 
-            // Render Chart
             const ctx = document.getElementById('resultsChart').getContext('2d');
             new Chart(ctx, {
                 type: 'line',
@@ -663,40 +657,4 @@
                         y: {
                             beginAtZero: true,
                             max: 50,
-                            ticks: { 
-                                stepSize: 10,
-                                font: { size: 12, weight: 'bold' } 
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                font: { size: 14, weight: 'bold' }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        document.addEventListener('keydown', (event) => {
-            const testScreen = document.getElementById('test-screen');
-            if (!testScreen.classList.contains('active')) {
-                return;
-            }
-
-            if (event.ctrlKey || event.altKey || event.metaKey) {
-                return;
-            }
-
-            const key = event.key.toUpperCase();
-            if (LETTERS.includes(key)) {
-                submitAnswer(key);
-                event.preventDefault(); 
-            }
-        });
-
-    </script>
-</body>
-</html>
+                            ticks: {
