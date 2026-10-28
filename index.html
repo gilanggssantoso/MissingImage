@@ -607,18 +607,18 @@
             let stabilityRating = "";
             let description = "";
 
-            if (stats.sd <= 2.0) {
-                stabilityRating = "SANGAT STABIL (VERY STABLE)";
-                description = "Kinerja Anda sangat konsisten di seluruh rangkaian tes. Fluktuasi performa sangat minimal, menunjukkan ketahanan mental dan daya tahan kerja yang sangat baik.";
+            if (stats.sd <= 1.5) {
+                stabilityRating = "EXCELLENT / VERY STABLE (0.0 - 1.5)";
+                description = "Kinerja sangat konsisten, tahan terhadap kelelahan, dan memiliki kontrol emosional yang sangat baik (Highly consistent, resistant to fatigue, excellent emotional control).";
+            } else if (stats.sd <= 2.5) {
+                stabilityRating = "GOOD / STABLE (1.6 - 2.5)";
+                description = "Fluktuasi dalam batas normal, memiliki stamina dan fokus kerja standar (Normal fluctuation, standard stamina and focus).";
             } else if (stats.sd <= 4.0) {
-                stabilityRating = "STABIL (STABLE)";
-                description = "Kinerja Anda stabil secara keseluruhan dengan sedikit variasi ritme kerja antar set. Ritme kerja relatif terjaga.";
-            } else if (stats.sd <= 6.0) {
-                stabilityRating = "CUKUP STABIL / FLUKTUATIF MODERAT";
-                description = "Terdapat fluktuasi kecepatan dan ketelitian antar set. Hal ini dapat menandakan hilangnya fokus sementara atau penyesuaian ritme di pertengahan tes.";
+                stabilityRating = "AVERAGE (2.6 - 4.0)";
+                description = "Terdapat variasi performa yang terlihat (grafik naik-turun), cukup rentan terhadap distraksi sedang atau kelelahan (Noticeable peaks and valleys, susceptible to moderate distraction or fatigue).";
             } else {
-                stabilityRating = "KURANG STABIL (HIGH FLUCTUATION)";
-                description = "Tingkat kestabilan performa tergolong rendah dengan fluktuasi skor yang tajam antar set. Menunjukkan kecenderungan kejenuhan, kelelahan, atau ketidakkonsistenan ritme kerja.";
+                stabilityRating = "POOR / UNSTABLE (> 4.0)";
+                description = "Tingkat kestabilan rendah, reaktivitas emosional tinggi, mudah bosan, atau mengalami penurunan daya tahan cepat di bawah tekanan (High emotional reactivity, easily bored, or rapid exhaustion under pressure).";
             }
 
             interpContainer.innerHTML = `<strong>Tingkat Stabilitas:</strong> ${stabilityRating}<br><br>${description}`;
