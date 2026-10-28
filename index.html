@@ -135,7 +135,7 @@
         .screen { display: none; }
         .screen.active { display: block; }
 
-        /* Timer with Black Square Border (Transparent/White Background) */
+        /* Timer with Black Square Border */
         .timer {
             font-size: 2.5rem;
             font-weight: bold;
@@ -171,7 +171,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: var(--bg-color);
+            background-color: #ffffff; /* Solid white background prevents filter block issues */
             box-shadow: 2px 2px 0 var(--border-color);
         }
 
@@ -180,7 +180,8 @@
             height: 44px;
             object-fit: contain;
             pointer-events: none;
-            /* No filters applied so images show in full color */
+            /* Safe monochromatic filter without breaking background */
+            filter: grayscale(100%) contrast(250%); 
         }
 
         .symbol-label {
