@@ -3,51 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tes Gambar Hilang</title>
+    <title>Missing Symbol Test</title>
+    
+    <!-- Retro Pixel Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --text-color: #333;
+            --text-color: #000;
             --bg-color: #fff;
-            --border-color: #333;
+            --border-color: #000;
+            --desktop-bg: #e0e0e0;
+            --desktop-dot: #a0a0a0;
         }
         
         * {
             box-sizing: border-box;
+            font-family: 'VT323', monospace;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            /* Classic dithered/checkered desktop background */
+            background-color: var(--desktop-bg);
+            background-image: 
+              linear-gradient(45deg, var(--desktop-dot) 25%, transparent 25%, transparent 75%, var(--desktop-dot) 75%, var(--desktop-dot)), 
+              linear-gradient(45deg, var(--desktop-dot) 25%, transparent 25%, transparent 75%, var(--desktop-dot) 75%, var(--desktop-dot));
+            background-size: 4px 4px;
+            background-position: 0 0, 2px 2px;
+            
             color: var(--text-color);
-            background-color: var(--bg-color);
             display: flex;
             flex-direction: column;
             align-items: center;
             margin: 0;
             padding: 20px;
-            text-align: center;
         }
 
         h1, h2, h3 {
             font-weight: normal;
+            margin-top: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
+        h1 { font-size: 2.5rem; }
+        h2 { font-size: 2rem; }
+
+        /* Classic Window UI */
+        .window-container {
+            background-color: var(--bg-color);
+            border: 2px solid var(--border-color);
+            box-shadow: 6px 6px 0 var(--border-color);
+            width: 100%;
+            max-width: 750px;
+            margin: 30px auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .title-bar {
+            border-bottom: 2px solid var(--border-color);
+            height: 32px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            background-color: var(--bg-color);
+        }
+
+        .title-bar-lines {
+            flex-grow: 1;
+            height: 11px;
+            background: repeating-linear-gradient(
+                to bottom,
+                var(--border-color) 0px,
+                var(--border-color) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+        }
+
+        .title-bar-text {
+            padding: 0 12px;
+            font-weight: normal;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+
+        .title-bar-close {
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--border-color);
+            margin-right: 10px;
+        }
+
+        .window-content {
+            padding: 30px;
+            text-align: center;
+        }
+
+        /* Screen Visibility */
         .screen {
             display: none;
-            width: 100%;
-            max-width: 800px;
-            margin-top: 40px;
         }
 
         .screen.active {
             display: block;
         }
 
+        /* Digital Clock Timer */
         .timer {
-            font-size: 2.2rem;
-            font-weight: bold;
+            font-size: 3rem;
+            border: 2px solid var(--border-color);
+            display: inline-block;
+            padding: 5px 25px;
+            background-color: var(--text-color);
+            color: var(--bg-color);
             margin: 20px 0;
-            font-variant-numeric: tabular-nums;
+            letter-spacing: 2px;
         }
 
         .symbols-row {
@@ -67,27 +142,26 @@
 
         .symbol-box {
             border: 2px solid var(--border-color);
-            width: 64px;
-            height: 64px;
+            width: 68px;
+            height: 68px;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 6px;
-            background-color: #fafafa;
+            background-color: var(--bg-color);
+            box-shadow: 3px 3px 0 var(--border-color);
         }
 
         .symbol-img {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             object-fit: contain;
             pointer-events: none;
-            /* This forces the image to be a pure black monochromatic silhouette */
-            filter: grayscale(100%) brightness(0); 
+            /* High contrast, stark B&W filter */
+            filter: grayscale(100%) contrast(500%) brightness(0.2); 
         }
 
         .symbol-label {
-            font-size: 1.2rem;
-            font-weight: bold;
+            font-size: 1.8rem;
         }
 
         .options-row {
@@ -97,25 +171,29 @@
             margin-top: 40px;
         }
 
+        /* Retro Buttons */
         button {
-            background-color: transparent;
+            background-color: var(--bg-color);
             border: 2px solid var(--border-color);
             color: var(--text-color);
-            padding: 12px 30px;
-            font-size: 1.2rem;
+            padding: 10px 24px;
+            font-size: 1.6rem;
             cursor: pointer;
-            border-radius: 6px;
-            transition: all 0.15s ease-in-out;
+            box-shadow: 3px 3px 0 var(--border-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: none; /* No modern fading */
         }
 
-        button:hover, button:active {
+        button:active {
             background-color: var(--text-color);
             color: var(--bg-color);
+            box-shadow: 0 0 0 var(--border-color);
+            transform: translate(3px, 3px);
         }
 
         .option-btn {
-            font-size: 1.4rem;
-            font-weight: bold;
+            font-size: 2rem;
             width: 60px;
             height: 60px;
             padding: 0;
@@ -123,14 +201,17 @@
 
         .chart-container {
             width: 100%;
-            max-width: 700px;
+            max-width: 650px;
             margin: 40px auto;
+            border: 2px solid var(--border-color);
+            padding: 15px;
+            background: #fff;
         }
 
         .divider {
             width: 100%;
-            height: 1px;
-            background-color: #e0e0e0;
+            height: 2px;
+            background-color: var(--border-color);
             margin: 30px 0;
         }
 
@@ -138,67 +219,83 @@
             text-align: left;
             display: inline-block;
             margin-bottom: 30px;
-            line-height: 1.8;
-            font-size: 1.05rem;
+            line-height: 1.6;
+            font-size: 1.4rem;
         }
     </style>
 </head>
 <body>
 
-    <!-- START SCREEN -->
-    <div id="start-screen" class="screen active">
-        <h1 style="margin-bottom: 30px;">Missing Symbol Test</h1>
-        <ul class="info-list">
-            <li>You will complete 10 sets of 50 questions.</li>
-            <li>Before each set, you will have 10 seconds to memorize 5 symbols matched with letters (A-E).</li>
-            <li>You then have 1 minute per set to identify which symbol is missing from the groups of 4.</li>
-            <li><strong>You can click the buttons or use the A, B, C, D, E keys on your keyboard to answer.</strong></li>
-        </ul>
-        <br>
-        <button onclick="startTest()">Mulai Tes</button>
-    </div>
-
-    <!-- MEMORIZE SCREEN -->
-    <div id="memorize-screen" class="screen">
-        <h2 id="memorize-set-title">Set 1 / 10</h2>
-        <p>Memorize these symbols:</p>
-        <div class="timer" id="memorize-timer">10</div>
-        <div class="symbols-row" id="memorize-symbols"></div>
-    </div>
-
-    <!-- TEST SCREEN -->
-    <div id="test-screen" class="screen">
-        <h2 id="test-set-title">Set 1 / 10</h2>
-        <div class="timer" id="test-timer">60</div>
-        
-        <!-- Reference Symbols -->
-        <div class="symbols-row" id="reference-symbols" style="transform: scale(0.85); margin: 0;"></div>
-        
-        <div class="divider"></div>
-
-        <!-- Question Symbols (Only 4) -->
-        <div class="symbols-row" id="question-symbols"></div>
-        
-        <!-- Answer Options -->
-        <div class="options-row">
-            <button class="option-btn" id="btn-A" onclick="submitAnswer('A')">A</button>
-            <button class="option-btn" id="btn-B" onclick="submitAnswer('B')">B</button>
-            <button class="option-btn" id="btn-C" onclick="submitAnswer('C')">C</button>
-            <button class="option-btn" id="btn-D" onclick="submitAnswer('D')">D</button>
-            <button class="option-btn" id="btn-E" onclick="submitAnswer('E')">E</button>
+    <div class="window-container">
+        <!-- Macintosh Style Title Bar -->
+        <div class="title-bar">
+            <div class="title-bar-close"></div>
+            <div class="title-bar-lines"></div>
+            <div class="title-bar-text">Missing Symbol Test</div>
+            <div class="title-bar-lines"></div>
         </div>
-    </div>
 
-    <!-- RESULT SCREEN -->
-    <div id="result-screen" class="screen">
-        <h1>Test Complete</h1>
-        <p>Your performance across the 10 sets:</p>
-        <div class="chart-container">
-            <canvas id="resultsChart"></canvas>
+        <div class="window-content">
+            <!-- START SCREEN -->
+            <div id="start-screen" class="screen active">
+                <h1 style="margin-bottom: 30px;">Missing Symbol Test</h1>
+                <ul class="info-list">
+                    <li>You will complete 10 sets of 50 questions.</li>
+                    <li>Before each set, you will have 10 seconds to memorize 5 symbols matched with letters (A-E).</li>
+                    <li>You then have 1 minute per set to identify which symbol is missing from the groups of 4.</li>
+                    <li><strong>You can click the buttons or use the A, B, C, D, E keys on your keyboard to answer.</strong></li>
+                </ul>
+                <br>
+                <button onclick="startTest()">Mulai Tes</button>
+            </div>
+
+            <!-- MEMORIZE SCREEN -->
+            <div id="memorize-screen" class="screen">
+                <h2 id="memorize-set-title">Set 1 / 10</h2>
+                <p style="font-size: 1.4rem;">Memorize these symbols:</p>
+                <div class="timer" id="memorize-timer">10</div>
+                <div class="symbols-row" id="memorize-symbols"></div>
+            </div>
+
+            <!-- TEST SCREEN -->
+            <div id="test-screen" class="screen">
+                <h2 id="test-set-title">Set 1 / 10</h2>
+                <div class="timer" id="test-timer">60</div>
+                
+                <!-- Reference Symbols -->
+                <div class="symbols-row" id="reference-symbols" style="transform: scale(0.85); margin: 0;"></div>
+                
+                <div class="divider"></div>
+
+                <!-- Question Symbols (Only 4) -->
+                <div class="symbols-row" id="question-symbols"></div>
+                
+                <!-- Answer Options -->
+                <div class="options-row">
+                    <button class="option-btn" id="btn-A" onclick="submitAnswer('A')">A</button>
+                    <button class="option-btn" id="btn-B" onclick="submitAnswer('B')">B</button>
+                    <button class="option-btn" id="btn-C" onclick="submitAnswer('C')">C</button>
+                    <button class="option-btn" id="btn-D" onclick="submitAnswer('D')">D</button>
+                    <button class="option-btn" id="btn-E" onclick="submitAnswer('E')">E</button>
+                </div>
+            </div>
+
+            <!-- RESULT SCREEN -->
+            <div id="result-screen" class="screen">
+                <h1>Test Complete</h1>
+                <p style="font-size: 1.4rem;">Your performance across the 10 sets:</p>
+                <div class="chart-container">
+                    <canvas id="resultsChart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        // Set Chart.js global defaults for retro look
+        Chart.defaults.font.family = "'VT323', monospace";
+        Chart.defaults.color = '#000';
+
         const LETTERS = ['A', 'B', 'C', 'D', 'E'];
         const TOTAL_SETS = 10;
         const QUESTIONS_PER_SET = 50;
@@ -209,7 +306,7 @@
         let questionsAnswered = 0;
         let currentScore = 0;
         let scores = [];
-        let currentSymbols = []; // Stores objects: { letter, imgUrl }
+        let currentSymbols = []; 
         let currentMissingLetter = '';
         let timerInterval = null;
 
@@ -238,8 +335,8 @@
             const timestamp = Date.now();
             return LETTERS.map((letter, index) => {
                 const seed = `symbol_${currentSet}_${index}_${timestamp}_${Math.random().toString(36).substring(2, 7)}`;
-                // Added backgroundColor=transparent to ensure only the icon shape is visible for the silhouette
-                const imgUrl = `https://api.dicebear.com/7.x/icons/svg?seed=${seed}&backgroundColor=transparent`;
+                const imgUrl = `https://api.dicebear.com/7.x/icons/svg?seed=${seed}`;
+                
                 const img = new Image();
                 img.src = imgUrl;
                 return { letter: letter, imgUrl: imgUrl };
@@ -339,14 +436,19 @@
                 currentScore++;
             }
             
+            // Retro keyboard press visual feedback
             const btn = document.getElementById(`btn-${letter}`);
             if (btn) {
+                btn.style.boxShadow = '0 0 0 var(--border-color)';
+                btn.style.transform = 'translate(3px, 3px)';
                 btn.style.backgroundColor = 'var(--text-color)';
                 btn.style.color = 'var(--bg-color)';
                 setTimeout(() => {
-                    btn.style.backgroundColor = 'transparent';
+                    btn.style.boxShadow = '3px 3px 0 var(--border-color)';
+                    btn.style.transform = 'none';
+                    btn.style.backgroundColor = 'var(--bg-color)';
                     btn.style.color = 'var(--text-color)';
-                }, 100);
+                }, 100); // 100ms snappy reset
             }
 
             questionsAnswered++;
@@ -370,29 +472,38 @@
                     datasets: [{
                         label: 'Correct Answers (Max 50)',
                         data: scores,
-                        borderColor: '#333',
-                        backgroundColor: 'rgba(51, 51, 51, 0.08)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.2,
-                        pointBackgroundColor: '#333',
-                        pointRadius: 5
+                        borderColor: '#000',
+                        backgroundColor: 'transparent',
+                        borderWidth: 3,
+                        tension: 0, /* Straight, sharp retro lines */
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#000',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointStyle: 'rect' /* Square points */
                     }]
                 },
                 options: {
                     responsive: true,
                     scales: {
+                        x: {
+                            ticks: { font: { size: 14 } }
+                        },
                         y: {
                             beginAtZero: true,
                             max: 50,
-                            ticks: {
-                                stepSize: 10
+                            ticks: { 
+                                stepSize: 10,
+                                font: { size: 14 } 
                             }
                         }
                     },
                     plugins: {
                         legend: {
-                            display: true
+                            labels: {
+                                font: { size: 16 }
+                            }
                         }
                     }
                 }
