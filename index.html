@@ -178,7 +178,6 @@
             height: 44px;
             object-fit: contain;
             pointer-events: none;
-            /* Filter removed to make the images normal and legible again */
         }
 
         .symbol-label {
@@ -332,13 +331,13 @@
 
                 <p style="font-weight: bold; margin-bottom: 10px;">Select Test Duration:</p>
                 <div class="mode-selection">
-                    <button class="mode-btn" onclick="selectDuration(3, this)">3 Mins (3 Sets)</button>
-                    <button class="mode-btn" onclick="selectDuration(5, this)">5 Mins (5 Sets)</button>
-                    <button class="mode-btn" onclick="selectDuration(8, this)">8 Mins (8 Sets)</button>
-                    <button class="mode-btn selected" onclick="selectDuration(10, this)">10 Mins (10 Sets)</button>
+                    <button type="button" class="mode-btn" onclick="selectDuration(3, this)">3 Mins (3 Sets)</button>
+                    <button type="button" class="mode-btn" onclick="selectDuration(5, this)">5 Mins (5 Sets)</button>
+                    <button type="button" class="mode-btn" onclick="selectDuration(8, this)">8 Mins (8 Sets)</button>
+                    <button type="button" class="mode-btn selected" onclick="selectDuration(10, this)">10 Mins (10 Sets)</button>
                 </div>
 
-                <button onclick="startTest()">Mulai Tes</button>
+                <button type="button" onclick="startTest()">Mulai Tes</button>
             </div>
 
             <!-- MEMORIZE SCREEN -->
@@ -359,11 +358,11 @@
                 <div class="symbols-row" id="question-symbols"></div>
                 
                 <div class="options-row">
-                    <button class="option-btn" id="btn-A" onclick="submitAnswer('A')">A</button>
-                    <button class="option-btn" id="btn-B" onclick="submitAnswer('B')">B</button>
-                    <button class="option-btn" id="btn-C" onclick="submitAnswer('C')">C</button>
-                    <button class="option-btn" id="btn-D" onclick="submitAnswer('D')">D</button>
-                    <button class="option-btn" id="btn-E" onclick="submitAnswer('E')">E</button>
+                    <button type="button" class="option-btn" id="btn-A" onclick="submitAnswer('A')">A</button>
+                    <button type="button" class="option-btn" id="btn-B" onclick="submitAnswer('B')">B</button>
+                    <button type="button" class="option-btn" id="btn-C" onclick="submitAnswer('C')">C</button>
+                    <button type="button" class="option-btn" id="btn-D" onclick="submitAnswer('D')">D</button>
+                    <button type="button" class="option-btn" id="btn-E" onclick="submitAnswer('E')">E</button>
                 </div>
             </div>
 
@@ -404,7 +403,7 @@
                 </div>
 
                 <br><br>
-                <button onclick="location.reload()">Ulangi Tes</button>
+                <button type="button" onclick="location.reload()">Ulangi Tes</button>
             </div>
         </div>
     </div>
@@ -657,4 +656,40 @@
                         y: {
                             beginAtZero: true,
                             max: 50,
-                            ticks: {
+                            ticks: { 
+                                stepSize: 10,
+                                font: { size: 12, weight: 'bold' } 
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                font: { size: 14, weight: 'bold' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('keydown', (event) => {
+            const testScreen = document.getElementById('test-screen');
+            if (!testScreen.classList.contains('active')) {
+                return;
+            }
+
+            if (event.ctrlKey || event.altKey || event.metaKey) {
+                return;
+            }
+
+            const key = event.key.toUpperCase();
+            if (LETTERS.includes(key)) {
+                submitAnswer(key);
+                event.preventDefault(); 
+            }
+        });
+
+    </script>
+</body>
+</html>
