@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Missing Symbol Test – Retro Edition</title>
+    <title>Missing Image Test – Retro Edition</title>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -140,7 +140,7 @@
             box-shadow: 2px 2px 0 var(--border-color);
         }
 
-        .symbols-row {
+        .images-row {
             display: flex;
             justify-content: center;
             gap: 20px;
@@ -148,14 +148,14 @@
             flex-wrap: wrap;
         }
 
-        .symbol-wrapper {
+        .image-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 10px;
         }
 
-        .symbol-box {
+        .image-box {
             border: 2px solid var(--border-color);
             width: 68px;
             height: 68px;
@@ -166,7 +166,7 @@
             box-shadow: 2px 2px 0 var(--border-color);
         }
 
-        .symbol-img {
+        .image-icon {
             width: 44px;
             height: 44px;
             object-fit: contain;
@@ -174,7 +174,7 @@
             filter: grayscale(100%) brightness(0.35) contrast(150%);
         }
 
-        .symbol-label {
+        .image-label {
             font-size: 1.4rem;
             font-weight: bold;
         }
@@ -314,17 +314,17 @@
         <div class="title-bar">
             <div class="title-bar-close"></div>
             <div class="title-bar-lines"></div>
-            <div class="title-bar-text">Missing Symbol Test</div>
+            <div class="title-bar-text">Missing Image Test</div>
             <div class="title-bar-lines"></div>
         </div>
 
         <div class="window-content">
             <!-- START SCREEN -->
             <div id="start-screen" class="screen active">
-                <h1 style="margin-bottom: 20px;">Missing Symbol Test</h1>
+                <h1 style="margin-bottom: 20px;">Missing Image Test</h1>
                 <ul class="info-list">
-                    <li>Before each set, you have 10 seconds to memorize 5 symbols matched with letters (A-E).</li>
-                    <li>You have 1 minute per set to identify which symbol is missing from each group of 4.</li>
+                    <li>Before each set, you have 10 seconds to memorize 5 images matched with letters (A-E).</li>
+                    <li>You have 1 minute per set to identify which image is missing from each group of 4.</li>
                     <li>Use your mouse or the <strong>A, B, C, D, E</strong> keys on your keyboard.</li>
                 </ul>
 
@@ -342,9 +342,9 @@
             <!-- MEMORIZE SCREEN -->
             <div id="memorize-screen" class="screen">
                 <h2 id="memorize-set-title">Set 1 / 10</h2>
-                <p style="font-size: 1.1rem; font-weight: bold;">Memorize these symbols:</p>
+                <p style="font-size: 1.1rem; font-weight: bold;">Memorize these images:</p>
                 <div class="timer" id="memorize-timer">10</div>
-                <div class="symbols-row" id="memorize-symbols"></div>
+                <div class="images-row" id="memorize-images"></div>
             </div>
 
             <!-- TEST SCREEN -->
@@ -352,9 +352,9 @@
                 <h2 id="test-set-title">Set 1 / 10</h2>
                 <div class="timer" id="test-timer">60</div>
                 
-                <div class="symbols-row" id="reference-symbols" style="transform: scale(0.85); margin: 0;"></div>
+                <div class="images-row" id="reference-images" style="transform: scale(0.85); margin: 0;"></div>
                 <div class="divider"></div>
-                <div class="symbols-row" id="question-symbols"></div>
+                <div class="images-row" id="question-images"></div>
                 
                 <div class="options-row">
                     <button type="button" class="option-btn" id="btn-A" onclick="submitAnswer('A')">A</button>
@@ -425,7 +425,7 @@
         let questionsAnswered = 0;
         let currentScore = 0;
         let scores = [];
-        let currentSymbols = []; 
+        let currentImages = []; 
         let currentMissingLetter = '';
         let timerInterval = null;
 
@@ -456,10 +456,10 @@
             startNextSet();
         }
 
-        function generateSetSymbols() {
+        function generateSetImages() {
             const timestamp = Date.now();
             return LETTERS.map((letter, index) => {
-                const seed = `symbol_${currentSet}_${index}_${timestamp}_${Math.random().toString(36).substring(2, 7)}`;
+                const seed = `image_${currentSet}_${index}_${timestamp}_${Math.random().toString(36).substring(2, 7)}`;
                 const imgUrl = `https://api.dicebear.com/7.x/icons/svg?seed=${seed}&backgroundColor=transparent`;
                 return { letter: letter, imgUrl: imgUrl };
             });
@@ -473,7 +473,7 @@
 
             questionsAnswered = 0;
             currentScore = 0;
-            currentSymbols = generateSetSymbols();
+            currentImages = generateSetImages();
 
             startMemorizePhase();
         }
@@ -482,11 +482,11 @@
             showScreen('memorize-screen');
             document.getElementById('memorize-set-title').innerText = `Set ${currentSet} / ${totalSets}`;
             
-            const container = document.getElementById('memorize-symbols');
-            container.innerHTML = currentSymbols.map(sym => `
-                <div class="symbol-wrapper">
-                    <div class="symbol-box"><img src="${sym.imgUrl}" class="symbol-img" alt="symbol"></div>
-                    <div class="symbol-label">${sym.letter}</div>
+            const container = document.getElementById('memorize-images');
+            container.innerHTML = currentImages.map(item => `
+                <div class="image-wrapper">
+                    <div class="image-box"><img src="${item.imgUrl}" class="image-icon" alt="image"></div>
+                    <div class="image-label">${item.letter}</div>
                 </div>
             `).join('');
 
@@ -508,11 +508,11 @@
             showScreen('test-screen');
             document.getElementById('test-set-title').innerText = `Set ${currentSet} / ${totalSets}`;
             
-            const refContainer = document.getElementById('reference-symbols');
-            refContainer.innerHTML = currentSymbols.map(sym => `
-                <div class="symbol-wrapper">
-                    <div class="symbol-box"><img src="${sym.imgUrl}" class="symbol-img" alt="symbol"></div>
-                    <div class="symbol-label">${sym.letter}</div>
+            const refContainer = document.getElementById('reference-images');
+            refContainer.innerHTML = currentImages.map(item => `
+                <div class="image-wrapper">
+                    <div class="image-box"><img src="${item.imgUrl}" class="image-icon" alt="image"></div>
+                    <div class="image-label">${item.letter}</div>
                 </div>
             `).join('');
 
@@ -540,15 +540,15 @@
             }
 
             const missingIndex = Math.floor(Math.random() * 5);
-            currentMissingLetter = currentSymbols[missingIndex].letter;
+            currentMissingLetter = currentImages[missingIndex].letter;
 
-            let questionImages = currentSymbols.filter((_, idx) => idx !== missingIndex).map(s => s.imgUrl);
-            questionImages = shuffle(questionImages);
+            let questionImagesList = currentImages.filter((_, idx) => idx !== missingIndex).map(s => s.imgUrl);
+            questionImagesList = shuffle(questionImagesList);
 
-            const qContainer = document.getElementById('question-symbols');
-            qContainer.innerHTML = questionImages.map(imgUrl => `
-                <div class="symbol-wrapper">
-                    <div class="symbol-box"><img src="${imgUrl}" class="symbol-img" alt="symbol"></div>
+            const qContainer = document.getElementById('question-images');
+            qContainer.innerHTML = questionImagesList.map(imgUrl => `
+                <div class="image-wrapper">
+                    <div class="image-box"><img src="${imgUrl}" class="image-icon" alt="image"></div>
                 </div>
             `).join('');
         }
@@ -687,7 +687,7 @@
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "Missing_Symbol_Test_Results.csv");
+            link.setAttribute("download", "Missing_Image_Test_Results.csv");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
