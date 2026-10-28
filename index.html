@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Missing Symbol Test</title>
     
-    <!-- Retro Pixel Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -22,11 +17,12 @@
         
         * {
             box-sizing: border-box;
-            font-family: 'VT323', monospace;
+            font-family: "Geneva", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+            -webkit-font-smoothing: none;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
-            /* Classic dithered/checkered desktop background */
             background-color: var(--desktop-bg);
             background-image: 
               linear-gradient(45deg, var(--desktop-dot) 25%, transparent 25%, transparent 75%, var(--desktop-dot) 75%, var(--desktop-dot)), 
@@ -40,33 +36,64 @@
             align-items: center;
             margin: 0;
             padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* CRT Scanlines & Vignette */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: radial-gradient(circle at center, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+            z-index: 9998;
+            pointer-events: none;
+            animation: crt-flicker 0.15s infinite;
+        }
+
+        @keyframes crt-flicker {
+            0% { opacity: 0.98; }
+            50% { opacity: 0.95; }
+            100% { opacity: 0.99; }
         }
 
         h1, h2, h3 {
-            font-weight: normal;
+            font-weight: bold;
             margin-top: 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
-        h1 { font-size: 2.5rem; }
-        h2 { font-size: 2rem; }
+        h1 { font-size: 2.2rem; }
+        h2 { font-size: 1.8rem; }
 
-        /* Classic Window UI */
+        /* Window Container */
         .window-container {
             background-color: var(--bg-color);
             border: 2px solid var(--border-color);
-            box-shadow: 6px 6px 0 var(--border-color);
+            box-shadow: 4px 4px 0 var(--border-color);
             width: 100%;
             max-width: 750px;
             margin: 30px auto;
             display: flex;
             flex-direction: column;
+            position: relative;
+            z-index: 10;
         }
 
         .title-bar {
             border-bottom: 2px solid var(--border-color);
-            height: 32px;
+            height: 28px;
             display: flex;
             align-items: center;
             padding: 0 10px;
@@ -87,8 +114,8 @@
 
         .title-bar-text {
             padding: 0 12px;
-            font-weight: normal;
-            font-size: 1.4rem;
+            font-weight: bold;
+            font-size: 1.1rem;
             letter-spacing: 1px;
         }
 
@@ -97,6 +124,7 @@
             height: 14px;
             border: 2px solid var(--border-color);
             margin-right: 10px;
+            background-color: var(--bg-color);
         }
 
         .window-content {
@@ -104,18 +132,12 @@
             text-align: center;
         }
 
-        /* Screen Visibility */
-        .screen {
-            display: none;
-        }
+        .screen { display: none; }
+        .screen.active { display: block; }
 
-        .screen.active {
-            display: block;
-        }
-
-        /* Digital Clock Timer */
         .timer {
-            font-size: 3rem;
+            font-size: 2.5rem;
+            font-weight: bold;
             border: 2px solid var(--border-color);
             display: inline-block;
             padding: 5px 25px;
@@ -148,7 +170,7 @@
             justify-content: center;
             align-items: center;
             background-color: var(--bg-color);
-            box-shadow: 3px 3px 0 var(--border-color);
+            box-shadow: 2px 2px 0 var(--border-color);
         }
 
         .symbol-img {
@@ -156,12 +178,12 @@
             height: 44px;
             object-fit: contain;
             pointer-events: none;
-            /* High contrast, stark B&W filter */
-            filter: grayscale(100%) contrast(500%) brightness(0.2); 
+            filter: grayscale(100%);
         }
 
         .symbol-label {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
+            font-weight: bold;
         }
 
         .options-row {
@@ -171,41 +193,104 @@
             margin-top: 40px;
         }
 
-        /* Retro Buttons */
+        /* Buttons & Selection */
         button {
             background-color: var(--bg-color);
             border: 2px solid var(--border-color);
             color: var(--text-color);
             padding: 10px 24px;
-            font-size: 1.6rem;
+            font-size: 1.2rem;
+            font-weight: bold;
             cursor: pointer;
-            box-shadow: 3px 3px 0 var(--border-color);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: none; /* No modern fading */
+            box-shadow: 2px 2px 0 var(--border-color);
+            letter-spacing: 0.5px;
+            transition: none;
         }
 
         button:active {
             background-color: var(--text-color);
             color: var(--bg-color);
             box-shadow: 0 0 0 var(--border-color);
-            transform: translate(3px, 3px);
+            transform: translate(2px, 2px);
         }
 
         .option-btn {
-            font-size: 2rem;
+            font-size: 1.5rem;
             width: 60px;
             height: 60px;
             padding: 0;
         }
 
+        .mode-selection {
+            margin: 20px 0 30px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            font-size: 1rem;
+            padding: 8px 16px;
+        }
+
+        .mode-btn.selected {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
         .chart-container {
             width: 100%;
             max-width: 650px;
-            margin: 40px auto;
+            margin: 25px auto;
             border: 2px solid var(--border-color);
             padding: 15px;
             background: #fff;
+        }
+
+        /* Stats Box */
+        .stats-box {
+            border: 2px solid var(--border-color);
+            padding: 20px;
+            margin-top: 25px;
+            text-align: left;
+            background-color: #fafafa;
+            box-shadow: 2px 2px 0 var(--border-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            background-color: #fff;
+        }
+
+        .stat-card-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #555;
+            text-transform: uppercase;
+        }
+
+        .stat-card-value {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .interpretation-box {
+            margin-top: 20px;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            background-color: #fff;
+            font-size: 1.1rem;
+            line-height: 1.5;
         }
 
         .divider {
@@ -218,9 +303,9 @@
         .info-list {
             text-align: left;
             display: inline-block;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             line-height: 1.6;
-            font-size: 1.4rem;
+            font-size: 1.1rem;
         }
     </style>
 </head>
@@ -238,21 +323,28 @@
         <div class="window-content">
             <!-- START SCREEN -->
             <div id="start-screen" class="screen active">
-                <h1 style="margin-bottom: 30px;">Missing Symbol Test</h1>
+                <h1 style="margin-bottom: 20px;">Missing Symbol Test</h1>
                 <ul class="info-list">
-                    <li>You will complete 10 sets of 50 questions.</li>
-                    <li>Before each set, you will have 10 seconds to memorize 5 symbols matched with letters (A-E).</li>
-                    <li>You then have 1 minute per set to identify which symbol is missing from the groups of 4.</li>
-                    <li><strong>You can click the buttons or use the A, B, C, D, E keys on your keyboard to answer.</strong></li>
+                    <li>Before each set, you have 10 seconds to memorize 5 symbols matched with letters (A-E).</li>
+                    <li>You have 1 minute per set to identify which symbol is missing from each group of 4.</li>
+                    <li>Use your mouse or the <strong>A, B, C, D, E</strong> keys on your keyboard.</li>
                 </ul>
-                <br>
+
+                <p style="font-weight: bold; margin-bottom: 10px;">Select Test Duration:</p>
+                <div class="mode-selection">
+                    <button class="mode-btn" onclick="selectDuration(3, this)">3 Mins (3 Sets)</button>
+                    <button class="mode-btn" onclick="selectDuration(5, this)">5 Mins (5 Sets)</button>
+                    <button class="mode-btn" onclick="selectDuration(8, this)">8 Mins (8 Sets)</button>
+                    <button class="mode-btn selected" onclick="selectDuration(10, this)">10 Mins (10 Sets)</button>
+                </div>
+
                 <button onclick="startTest()">Mulai Tes</button>
             </div>
 
             <!-- MEMORIZE SCREEN -->
             <div id="memorize-screen" class="screen">
                 <h2 id="memorize-set-title">Set 1 / 10</h2>
-                <p style="font-size: 1.4rem;">Memorize these symbols:</p>
+                <p style="font-size: 1.1rem; font-weight: bold;">Memorize these symbols:</p>
                 <div class="timer" id="memorize-timer">10</div>
                 <div class="symbols-row" id="memorize-symbols"></div>
             </div>
@@ -262,15 +354,10 @@
                 <h2 id="test-set-title">Set 1 / 10</h2>
                 <div class="timer" id="test-timer">60</div>
                 
-                <!-- Reference Symbols -->
                 <div class="symbols-row" id="reference-symbols" style="transform: scale(0.85); margin: 0;"></div>
-                
                 <div class="divider"></div>
-
-                <!-- Question Symbols (Only 4) -->
                 <div class="symbols-row" id="question-symbols"></div>
                 
-                <!-- Answer Options -->
                 <div class="options-row">
                     <button class="option-btn" id="btn-A" onclick="submitAnswer('A')">A</button>
                     <button class="option-btn" id="btn-B" onclick="submitAnswer('B')">B</button>
@@ -283,25 +370,55 @@
             <!-- RESULT SCREEN -->
             <div id="result-screen" class="screen">
                 <h1>Test Complete</h1>
-                <p style="font-size: 1.4rem;">Your performance across the 10 sets:</p>
+                <p style="font-size: 1.1rem; font-weight: bold;">Performance & Stability Analysis:</p>
+                
                 <div class="chart-container">
                     <canvas id="resultsChart"></canvas>
                 </div>
+
+                <!-- STATISTICAL ANALYSIS BOX -->
+                <div class="stats-box">
+                    <h3 style="margin-bottom: 10px;">Performance Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-card-title">Mean / Average Score</div>
+                            <div class="stat-card-value" id="stat-mean">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-title">Sum of Squared Dev.</div>
+                            <div class="stat-card-value" id="stat-ssd">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-title">Variance (σ²)</div>
+                            <div class="stat-card-value" id="stat-variance">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-title">Std Deviation (σ)</div>
+                            <div class="stat-card-value" id="stat-sd">0</div>
+                        </div>
+                    </div>
+
+                    <div class="interpretation-box" id="interpretation-text">
+                        <!-- Dynamic Stability Interpretation -->
+                    </div>
+                </div>
+
+                <br><br>
+                <button onclick="location.reload()">Ulangi Tes</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Set Chart.js global defaults for retro look
-        Chart.defaults.font.family = "'VT323', monospace";
+        Chart.defaults.font.family = '"Geneva", "Helvetica Neue", "Helvetica", "Arial", sans-serif';
         Chart.defaults.color = '#000';
 
         const LETTERS = ['A', 'B', 'C', 'D', 'E'];
-        const TOTAL_SETS = 10;
         const QUESTIONS_PER_SET = 50;
         const MEMORIZE_DURATION = 10;
         const TEST_DURATION = 60;
 
+        let totalSets = 10; // Default total sets
         let currentSet = 1;
         let questionsAnswered = 0;
         let currentScore = 0;
@@ -309,6 +426,12 @@
         let currentSymbols = []; 
         let currentMissingLetter = '';
         let timerInterval = null;
+
+        function selectDuration(sets, btnElement) {
+            totalSets = sets;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('selected'));
+            btnElement.classList.add('selected');
+        }
 
         function shuffle(array) {
             let currentIndex = array.length, randomIndex;
@@ -344,7 +467,7 @@
         }
 
         function startNextSet() {
-            if (currentSet > TOTAL_SETS) {
+            if (currentSet > totalSets) {
                 showResults();
                 return;
             }
@@ -358,7 +481,7 @@
 
         function startMemorizePhase() {
             showScreen('memorize-screen');
-            document.getElementById('memorize-set-title').innerText = `Set ${currentSet} / ${TOTAL_SETS}`;
+            document.getElementById('memorize-set-title').innerText = `Set ${currentSet} / ${totalSets}`;
             
             const container = document.getElementById('memorize-symbols');
             container.innerHTML = currentSymbols.map(sym => `
@@ -384,7 +507,7 @@
 
         function startTestPhase() {
             showScreen('test-screen');
-            document.getElementById('test-set-title').innerText = `Set ${currentSet} / ${TOTAL_SETS}`;
+            document.getElementById('test-set-title').innerText = `Set ${currentSet} / ${totalSets}`;
             
             const refContainer = document.getElementById('reference-symbols');
             refContainer.innerHTML = currentSymbols.map(sym => `
@@ -436,19 +559,18 @@
                 currentScore++;
             }
             
-            // Retro keyboard press visual feedback
             const btn = document.getElementById(`btn-${letter}`);
             if (btn) {
                 btn.style.boxShadow = '0 0 0 var(--border-color)';
-                btn.style.transform = 'translate(3px, 3px)';
+                btn.style.transform = 'translate(2px, 2px)';
                 btn.style.backgroundColor = 'var(--text-color)';
                 btn.style.color = 'var(--bg-color)';
                 setTimeout(() => {
-                    btn.style.boxShadow = '3px 3px 0 var(--border-color)';
+                    btn.style.boxShadow = '2px 2px 0 var(--border-color)';
                     btn.style.transform = 'none';
                     btn.style.backgroundColor = 'var(--bg-color)';
                     btn.style.color = 'var(--text-color)';
-                }, 100); // 100ms snappy reset
+                }, 100); 
             }
 
             questionsAnswered++;
@@ -461,48 +583,96 @@
             startNextSet();
         }
 
+        function calculateStatistics(data) {
+            const n = data.length;
+            
+            // 1. Calculate Mean
+            const sum = data.reduce((a, b) => a + b, 0);
+            const mean = sum / n;
+
+            // 2. Deviations and Squared Deviations
+            const squaredDeviations = data.map(x => Math.pow(x - mean, 2));
+            const ssd = squaredDeviations.reduce((a, b) => a + b, 0);
+
+            // 3. Variance and Standard Deviation
+            const variance = ssd / n;
+            const sd = Math.sqrt(variance);
+
+            return { mean, ssd, variance, sd };
+        }
+
         function showResults() {
             showScreen('result-screen');
             
+            // Calculate Performance Stats
+            const stats = calculateStatistics(scores);
+            
+            document.getElementById('stat-mean').innerText = stats.mean.toFixed(2);
+            document.getElementById('stat-ssd').innerText = stats.ssd.toFixed(2);
+            document.getElementById('stat-variance').innerText = stats.variance.toFixed(2);
+            document.getElementById('stat-sd').innerText = stats.sd.toFixed(2);
+
+            // Interpret Stability
+            const interpContainer = document.getElementById('interpretation-text');
+            let stabilityRating = "";
+            let description = "";
+
+            if (stats.sd <= 2.0) {
+                stabilityRating = "SANGAT STABIL (VERY STABLE)";
+                description = "Kinerja Anda sangat konsisten di seluruh rangkaian tes. Fluktuasi performa sangat minimal, menunjukkan ketahanan mental dan daya tahan kerja yang sangat baik.";
+            } else if (stats.sd <= 4.0) {
+                stabilityRating = "STABIL (STABLE)";
+                description = "Kinerja Anda stabil secara keseluruhan dengan sedikit variasi ritme kerja antar set. Ritme kerja relatif terjaga.";
+            } else if (stats.sd <= 6.0) {
+                stabilityRating = "CUKUP STABIL / FLUKTUATIF MODERAT";
+                description = "Terdapat fluktuasi kecepatan dan ketelitian antar set. Hal ini dapat menandakan hilangnya fokus sementara atau penyesuaian ritme di pertengahan tes.";
+            } else {
+                stabilityRating = "KURANG STABIL (HIGH FLUCTUATION)";
+                description = "Tingkat kestabilan performa tergolong rendah dengan fluktuasi skor yang tajam antar set. Menunjukkan kecenderungan kejenuhan, kelelahan, atau ketidakkonsistenan ritme kerja.";
+            }
+
+            interpContainer.innerHTML = `<strong>Tingkat Stabilitas:</strong> ${stabilityRating}<br><br>${description}`;
+
+            // Render Chart
             const ctx = document.getElementById('resultsChart').getContext('2d');
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: Array.from({length: TOTAL_SETS}, (_, i) => `Set ${i + 1}`),
+                    labels: Array.from({length: totalSets}, (_, i) => `Set ${i + 1}`),
                     datasets: [{
                         label: 'Correct Answers (Max 50)',
                         data: scores,
                         borderColor: '#000',
                         backgroundColor: 'transparent',
                         borderWidth: 3,
-                        tension: 0, /* Straight, sharp retro lines */
+                        tension: 0, 
                         pointBackgroundColor: '#fff',
                         pointBorderColor: '#000',
                         pointBorderWidth: 2,
                         pointRadius: 6,
                         pointHoverRadius: 8,
-                        pointStyle: 'rect' /* Square points */
+                        pointStyle: 'rect' 
                     }]
                 },
                 options: {
                     responsive: true,
                     scales: {
                         x: {
-                            ticks: { font: { size: 14 } }
+                            ticks: { font: { size: 12, weight: 'bold' } }
                         },
                         y: {
                             beginAtZero: true,
                             max: 50,
                             ticks: { 
                                 stepSize: 10,
-                                font: { size: 14 } 
+                                font: { size: 12, weight: 'bold' } 
                             }
                         }
                     },
                     plugins: {
                         legend: {
                             labels: {
-                                font: { size: 16 }
+                                font: { size: 14, weight: 'bold' }
                             }
                         }
                     }
