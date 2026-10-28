@@ -21,7 +21,7 @@
         }
 
         body {
-            background-color: var(--bg-color); /* Clean white background */
+            background-color: var(--bg-color);
             color: var(--text-color);
             display: flex;
             flex-direction: column;
@@ -171,7 +171,6 @@
             height: 44px;
             object-fit: contain;
             pointer-events: none;
-            /* Perfectly balances grey/black without invisible shapes or solid blobs */
             filter: grayscale(100%) brightness(0.35) contrast(150%);
         }
 
@@ -199,6 +198,11 @@
             box-shadow: 2px 2px 0 var(--border-color);
             letter-spacing: 0.5px;
             transition: none;
+            outline: none; /* Removes the default blue browser focus border */
+        }
+
+        button:focus {
+            outline: none; /* Extra rule for safety across all browsers */
         }
 
         button:active {
