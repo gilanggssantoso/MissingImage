@@ -336,7 +336,7 @@
                     <button type="button" class="mode-btn selected" onclick="selectDuration(10, this)">10 Mins (10 Sets)</button>
                 </div>
 
-                <button type="button" onclick="startTest()">Mulai Tes</button>
+                <button type="button" onclick="startTest()">Start Test</button>
             </div>
 
             <!-- MEMORIZE SCREEN -->
@@ -365,7 +365,7 @@
                 </div>
 
                 <br><br>
-                <button type="button" onclick="location.reload()" style="font-size: 0.95rem; padding: 6px 16px;">Ulang Tes</button>
+                <button type="button" onclick="location.reload()" style="font-size: 0.95rem; padding: 6px 16px;">Retake Test</button>
             </div>
 
             <!-- RESULT SCREEN -->
@@ -405,7 +405,7 @@
                 <br>
                 <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                     <button type="button" onclick="downloadCSV()">Download CSV</button>
-                    <button type="button" onclick="location.reload()">Ulangi Tes</button>
+                    <button type="button" onclick="location.reload()">Retake Test</button>
                 </div>
             </div>
         </div>
@@ -608,20 +608,20 @@
             let description = "";
 
             if (stats.sd <= 1.5) {
-                stabilityRating = "EXCELLENT / VERY STABLE (0.0 - 1.5)";
-                description = "Kinerja sangat konsisten, tahan terhadap kelelahan, dan memiliki kontrol emosional yang sangat baik (Highly consistent, resistant to fatigue, excellent emotional control).";
+                stabilityRating = "VERY STABLE (0.0 - 1.5)";
+                description = "Highly consistent, resistant to fatigue, excellent emotional control.";
             } else if (stats.sd <= 2.5) {
-                stabilityRating = "GOOD / STABLE (1.6 - 2.5)";
-                description = "Fluktuasi dalam batas normal, memiliki stamina dan fokus kerja standar (Normal fluctuation, standard stamina and focus).";
+                stabilityRating = "STABLE (1.6 - 2.5)";
+                description = "Normal fluctuation, standard stamina and focus.";
             } else if (stats.sd <= 4.0) {
                 stabilityRating = "AVERAGE (2.6 - 4.0)";
-                description = "Terdapat variasi performa yang terlihat (grafik naik-turun), cukup rentan terhadap distraksi sedang atau kelelahan (Noticeable peaks and valleys, susceptible to moderate distraction or fatigue).";
+                description = "Noticeable peaks and valleys, susceptible to moderate distraction or fatigue.";
             } else {
                 stabilityRating = "POOR / UNSTABLE (> 4.0)";
-                description = "Tingkat kestabilan rendah, reaktivitas emosional tinggi, mudah bosan, atau mengalami penurunan daya tahan cepat di bawah tekanan (High emotional reactivity, easily bored, or rapid exhaustion under pressure).";
+                description = "High emotional reactivity, easily bored, or rapid exhaustion under pressure.";
             }
 
-            interpContainer.innerHTML = `<strong>Tingkat Stabilitas:</strong> ${stabilityRating}<br><br>${description}`;
+            interpContainer.innerHTML = `<strong>Stability Level:</strong> ${stabilityRating}<br><br>${description}`;
 
             const ctx = document.getElementById('resultsChart').getContext('2d');
             new Chart(ctx, {
