@@ -198,11 +198,11 @@
             box-shadow: 2px 2px 0 var(--border-color);
             letter-spacing: 0.5px;
             transition: none;
-            outline: none; /* Removes the default blue browser focus border */
+            outline: none;
         }
 
         button:focus {
-            outline: none; /* Extra rule for safety across all browsers */
+            outline: none;
         }
 
         button:active {
@@ -363,6 +363,9 @@
                     <button type="button" class="option-btn" id="btn-D" onclick="submitAnswer('D')">D</button>
                     <button type="button" class="option-btn" id="btn-E" onclick="submitAnswer('E')">E</button>
                 </div>
+
+                <br><br>
+                <button type="button" onclick="location.reload()" style="font-size: 0.95rem; padding: 6px 16px;">Ulang Tes</button>
             </div>
 
             <!-- RESULT SCREEN -->
