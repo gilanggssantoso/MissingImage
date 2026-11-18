@@ -196,7 +196,7 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
         }
 
         .mode-btn {
@@ -280,6 +280,10 @@
 
         /* Mobile Responsive Scaling */
         @media (max-width: 500px) {
+            .mode-btn {
+                font-size: 0.9rem;
+                padding: 6px 10px;
+            }
             .window-content {
                 padding: 15px 10px; /* Less padding to maximize space for boxes */
             }
@@ -337,19 +341,19 @@
 
                 <p style="font-weight: bold; margin-bottom: 10px;">Select Test Duration:</p>
                 <div class="mode-selection">
-                    <button type="button" class="mode-btn" onclick="selectDuration(3, this)">3 Mins (3 Sets)</button>
-                    <button type="button" class="mode-btn" onclick="selectDuration(5, this)">5 Mins (5 Sets)</button>
-                    <button type="button" class="mode-btn" onclick="selectDuration(8, this)">8 Mins (8 Sets)</button>
-                    <button type="button" class="mode-btn selected" onclick="selectDuration(10, this)">10 Mins (10 Sets)</button>
+                    <button type="button" class="mode-btn" onclick="selectDuration(3, this)">3 Menit</button>
+                    <button type="button" class="mode-btn" onclick="selectDuration(5, this)">5 Menit</button>
+                    <button type="button" class="mode-btn" onclick="selectDuration(8, this)">8 Menit</button>
+                    <button type="button" class="mode-btn selected" onclick="selectDuration(10, this)">10 Menit</button>
                 </div>
 
-                <button type="button" onclick="startTest()">Start Test</button>
+                <button type="button" onclick="startTest()">Mulai Tes</button>
             </div>
 
             <!-- MEMORIZE SCREEN -->
             <div id="memorize-screen" class="screen">
                 <h2 id="memorize-set-title">Set 1 / 10</h2>
-                <p style="font-size: 1.1rem; font-weight: bold;">Memorize these images:</p>
+                <p style="font-size: 1.1rem; font-weight: bold;">Ingatlah gambar-gambar berikut dengan saksama:</p>
                 <div class="timer" id="memorize-timer">10</div>
                 <div class="images-row" id="memorize-images"></div>
             </div>
